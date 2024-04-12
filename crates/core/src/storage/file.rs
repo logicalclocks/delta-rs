@@ -2,6 +2,7 @@
 //!
 //! The local file storage backend is multi-writer safe.
 
+extern crate libc;
 use bytes::Bytes;
 use futures::stream::BoxStream;
 use object_store::{
@@ -9,6 +10,7 @@ use object_store::{
     GetResult, ListResult, MultipartId, ObjectMeta, ObjectStore, PutOptions, PutResult,
     Result as ObjectStoreResult,
 };
+use std::ffi::CString;
 use std::ops::Range;
 use std::sync::Arc;
 use tokio::io::AsyncWrite;
@@ -287,31 +289,44 @@ mod imp {
         let to_path = String::from(to);
 
         tokio::task::spawn_blocking(move || {
-            std::fs::hard_link(&from_path, &to_path).map_err(|err| {
-                if err.kind() == std::io::ErrorKind::AlreadyExists {
-                    LocalFileSystemError::AlreadyExists {
-                        path: to_path,
-                        source: Box::new(err),
-                    }
-                } else if err.kind() == std::io::ErrorKind::NotFound {
-                    LocalFileSystemError::NotFound {
-                        path: from_path.clone(),
-                        source: Box::new(err),
+            let from_cstring = CString::new(from_path.clone()).expect("CString::new failed");
+            let to_cstring = CString::new(to_path.clone()).expect("CString::new failed");
+
+            println!("hopsfs-fix delta-rs renamteat2. From: {:?} To: {:?}", from_path, to_path);
+            unsafe {
+                let result = libc::renameat2(
+                    libc::AT_FDCWD,
+                    from_cstring.as_ptr(),
+                    libc::AT_FDCWD,
+                    to_cstring.as_ptr(),
+                    libc::RENAME_NOREPLACE,
+                );
+
+                if result == -1 {
+                    let error = std::io::Error::last_os_error();
+                    if error.kind() == std::io::ErrorKind::AlreadyExists {
+                        println!("hopsfs-fix delta-rs renamteat2 AlreadyExista");
+                        Err(LocalFileSystemError::AlreadyExists {
+                            path: String::from(to_path),
+                            source: Box::new(error),
+                        })
+                    } else if error.kind() == std::io::ErrorKind::NotFound {
+                        println!("hopsfs-fix delta-rs renamteat2 NotFound");
+                        Err(LocalFileSystemError::NotFound {
+                            path: String::from(from_path),
+                            source: Box::new(error),
+                        })
+                    } else {
+                        println!("hopsfs-fix delta-rs renamteat2 unhandled error: {}", error);
+                        Err(LocalFileSystemError::Generic {
+                            store: STORE_NAME,
+                            source: Box::new(error),
+                        })
                     }
                 } else {
-                    LocalFileSystemError::Generic {
-                        store: STORE_NAME,
-                        source: Box::new(err),
-                    }
+                    Ok(())
                 }
-            })?;
-
-            std::fs::remove_file(from_path).map_err(|err| LocalFileSystemError::Generic {
-                store: STORE_NAME,
-                source: Box::new(err),
-            })?;
-
-            Ok(())
+            } //unsafe
         })
         .await
         .unwrap()
