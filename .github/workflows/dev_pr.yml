@@ -1,13 +1,13 @@
 name: dev_pr
 
 # Trigger whenever a PR is changed (title as well as new / changed commits)
-on:
-  pull_request_target:
-    types:
-      - opened
-      - edited
-      - synchronize
-      - reopened
+# on:
+#  pull_request_target:
+#    types:
+#      - opened
+#      - edited
+#      - synchronize
+#      - reopened
 
 jobs:
   process:
