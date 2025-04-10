@@ -38,7 +38,7 @@ pipeline {
                     ).trim()
                     echo "Extracted hops native object store version: ${HOPS_NATIVE_BRANCH}"
 
-                    DST_DIR = "repo@repo.hops.works:/opt/repository/master/delta-rs/
+                    DST_DIR = "repo@repo.hops.works:/opt/repository/master/delta-rs/"
 
                     sh """
                         cat $REPO_CREDS > id_rsa
