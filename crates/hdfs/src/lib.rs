@@ -5,10 +5,6 @@ use deltalake_core::logstore::{
     default_logstore, logstore_factories, DeltaIOStorageBackend, LogStore, LogStoreFactory,
     StorageConfig,
 };
-use deltalake_core::storage::{
-    factories, limit_store_handler, url_prefix_handler, ObjectStoreFactory, ObjectStoreRef,
-    StorageOptions,
-};
 
 use deltalake_core::logstore::{object_store_factories, ObjectStoreFactory, ObjectStoreRef};
 use deltalake_core::{DeltaResult, Path};
