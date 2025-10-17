@@ -2,6 +2,8 @@ name: Build python hops_deltalake
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ hopsfs-294 ]
 
 defaults:
   run:
@@ -31,3 +33,26 @@ jobs:
           name: wheels-${{ matrix.target }}
           path: target/wheels/*.whl
 
+  build-manylinux-x86-64:
+    name: python whl file build on manylinux x86-64
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [ x86_64-unknown-linux-gnu ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheel file (without publishing)
+        uses: messense/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          command: build
+          args: --release -m python/Cargo.toml
+          before-script-linux: yum install -y perl-IPC-Cmd
+
+      - name: Upload wheel artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.target }}
+          path: target/wheels/*.whl
