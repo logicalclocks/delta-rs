@@ -48,6 +48,7 @@ jobs:
         with:
           target: ${{ matrix.target }}
           command: build
+          manylinux: 2_28
           args: --release -m python/Cargo.toml
 
       - name: Upload wheel artifacts
