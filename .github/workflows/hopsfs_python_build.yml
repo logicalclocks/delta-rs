@@ -49,7 +49,6 @@ jobs:
           target: ${{ matrix.target }}
           command: build
           args: --release -m python/Cargo.toml
-          before-script-linux: yum install -y perl-IPC-Cmd
 
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
