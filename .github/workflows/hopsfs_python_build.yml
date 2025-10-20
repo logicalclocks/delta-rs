@@ -46,6 +46,7 @@ jobs:
       - name: Build wheel file (without publishing)
         uses: messense/maturin-action@v1
         with:
+          maturin-version: v1.6.0 # https://github.com/PyO3/maturin/issues/2154
           target: ${{ matrix.target }}
           command: build
           manylinux: 2_28
