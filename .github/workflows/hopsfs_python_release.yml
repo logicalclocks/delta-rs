@@ -2,6 +2,8 @@ name: Build python hops_deltalake
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ hopsfs-294 ]
 
 defaults:
   run:
@@ -9,7 +11,7 @@ defaults:
 
 jobs:
   build-mac:
-    name: python whl file build on Mac
+    name: PyPI release on Mac
     strategy:
       fail-fast: false
       matrix:
@@ -18,21 +20,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build wheel file (without publishing)
+      - name: Publish to pypi (without sdist)
         uses: messense/maturin-action@v1
+        env:
+          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         with:
           target: ${{ matrix.target }}
-          command: build
-          args: --release -m python/Cargo.toml
-
-      - name: Save wheel artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-${{ matrix.target }}
-          path: target/wheels/*.whl
+          command: publish
+          args: --skip-existing --repository-url https://test.pypi.org/legacy/ -m python/Cargo.toml --no-sdist
 
   build-manylinux-x86-64:
-    name: python whl file build on manylinux x86-64
+    name: PyPI release manylinux-2_28 x86_64
     strategy:
       fail-fast: false
       matrix:
@@ -41,19 +39,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build wheel file (without publishing)
+      - name: Publish manylinux to pypi x86_64 (with sdist)
         uses: messense/maturin-action@v1
+        env:
+          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         with:
           maturin-version: v1.6.0 # https://github.com/PyO3/maturin/issues/2154
           target: ${{ matrix.target }}
-          command: build
+          command: publish
           manylinux: 2_28
-          args: --release -m python/Cargo.toml
+          args: --skip-existing --repository-url https://test.pypi.org/legacy/ -m python/Cargo.toml
           # for openssl build
           before-script-linux: yum install -y perl-IPC-Cmd openssl-devel pkgconfig
-
-      - name: Save wheel artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-${{ matrix.target }}
-          path: target/wheels/*.whl
