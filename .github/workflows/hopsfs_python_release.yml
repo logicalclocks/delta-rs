@@ -1,9 +1,7 @@
-name: Build python hops_deltalake
+name: Release python hops_deltalake
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ hopsfs-294 ]
 
 defaults:
   run:
