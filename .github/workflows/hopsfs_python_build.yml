@@ -50,6 +50,8 @@ jobs:
           command: build
           manylinux: 2_28
           args: --release -m python/Cargo.toml
+          # for openssl build
+          before-script-linux: yum install -y perl-IPC-Cmd
 
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
