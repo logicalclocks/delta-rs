@@ -25,7 +25,7 @@ jobs:
         with:
           target: ${{ matrix.target }}
           command: publish
-          args: --skip-existing --repository-url https://test.pypi.org/legacy/ -m python/Cargo.toml --no-sdist
+          args: --skip-existing -m python/Cargo.toml --no-sdist
 
   build-manylinux-x86-64:
     name: PyPI release manylinux-2_28 x86_64
@@ -46,6 +46,6 @@ jobs:
           target: ${{ matrix.target }}
           command: publish
           manylinux: 2_28
-          args: --skip-existing --repository-url https://test.pypi.org/legacy/ -m python/Cargo.toml
+          args: --skip-existing -m python/Cargo.toml
           # for openssl build
           before-script-linux: yum install -y perl-IPC-Cmd openssl-devel pkgconfig
