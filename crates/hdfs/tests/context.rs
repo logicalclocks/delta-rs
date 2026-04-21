@@ -1,7 +1,7 @@
 #![cfg(feature = "integration_test")]
 use deltalake_hdfs::register_handlers;
 use deltalake_test::utils::*;
-use hdfs_native_object_store::minidfs::MiniDfs;
+use hopsfs_native_object_store::minidfs::MiniDfs;
 use std::{
     collections::HashSet,
     process::{Command, ExitStatus},

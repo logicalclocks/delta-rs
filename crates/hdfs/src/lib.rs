@@ -5,7 +5,7 @@ use deltalake_core::logstore::{
 };
 use deltalake_core::logstore::{ObjectStoreFactory, ObjectStoreRef, object_store_factories};
 use deltalake_core::{DeltaResult, Path};
-use hdfs_native_object_store::HdfsObjectStoreBuilder;
+use hopsfs_native_object_store::HdfsObjectStoreBuilder;
 use url::Url;
 
 #[derive(Clone, Default, Debug)]
